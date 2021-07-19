@@ -41,7 +41,7 @@ def main(fasta):
     seqhandle = open(fasta, 'r')
     for fastaseq in SeqIO.parse(seqhandle, 'fasta'):
         s = str(fastaseq.seq)
-        gid = fastaseq.id.replace('T', 'G').rsplit('.')[0]
+        gid = fastaseq.id.split('|')[0]
         repeats = re.finditer(re_search, s)
         has_ssr = '0'
         has_hom = '0'

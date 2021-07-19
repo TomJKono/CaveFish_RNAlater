@@ -23,7 +23,7 @@ sub_exp <- counts[, as.character(exp_dat$samplename)]
 dds <- DESeqDataSetFromMatrix(
     countData=sub_exp,
     colData=exp_dat,
-    design=~Condition)
+    design=~Condition+RIN)
 
 # Make summary plots of the read counts
 pdf(file="RNAlater_RawCounts.pdf", height=8, width=11)
@@ -132,16 +132,21 @@ plot(
 points(
     pc$x[rnalater, "PC1"], pc$x[rnalater, "PC2"],
     col=rnalater_col,
-    pch=19)
+    pch=1)
 text(pc$x[liquidn, "PC1"], pc$x[liquidn, "PC2"], cex=0.5, srt=-30, pos=2, offset=0.25, labels=liquidn, col=ln_col)
 text(pc$x[rnalater, "PC1"], pc$x[rnalater, "PC2"], cex=0.5, srt=-30, pos=2, offset=0.25, labels=rnalater, col=rnalater_col)
-legend("topright", c("LN2", "RNAlater"), col=c(ln_col, rnalater_col), pch=19, cex=0.5)
+legend("topright", c("LN2", "RNAlater"), col=c(ln_col, rnalater_col), pch=c(19, 1), cex=0.5)
+
+norm_counts <- t(cts)
+colnames(norm_counts) <- names(sub_exp)
+write.csv(
+    norm_counts,
+    file="RNALater_Normalized_Counts.csv",
+    row.names=TRUE,
+    quote=FALSE)
 
 dev.off()
 pdf(file="RNAlater_FilteredCounts_PCA.pdf", 6, 6)
-cts <- t(assay(vst(dds, blind=FALSE), normalized=TRUE))
-pc <- prcomp(cts)
-summary(pc)
 liquidn <- exp_dat$samplename[exp_dat$Condition == "LN2"]
 rnalater <- exp_dat$samplename[exp_dat$Condition == "RNAlater"]
 plot(
